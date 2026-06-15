@@ -2,7 +2,7 @@
 
 > A [Seneca.js](http://senecajs.org) Auth Plugin
 
-# seneca-auth
+# @seneca/auth
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
