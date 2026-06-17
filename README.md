@@ -64,15 +64,3 @@ This plugin was created to provide standardized authentication for the
 Seneca microservices framework. It is part of the
 [Voxgig](https://www.voxgig.com) open source initiative.
 
-## License
-
-Copyright (c) 2013-2024, Richard Rodger and other contributors.
-Licensed under [MIT][].
-
-[MIT]: ./LICENSE
-[npm-badge]: https://img.shields.io/npm/v/seneca-auth.svg
-[npm-url]: https://npmjs.com/package/seneca-auth
-[travis-badge]: https://travis-ci.org/senecajs/seneca-auth.svg
-[travis-url]: https://travis-ci.org/senecajs/seneca-auth
-[coveralls-badge]: https://coveralls.io/repos/senecajs/seneca-auth/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/github/senecajs/seneca-auth?branch=master
