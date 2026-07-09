@@ -15,6 +15,30 @@ A user authentication plugin, using [PassportJS](http://passportjs.org) for Expr
 | ![Voxgig](https://www.voxgig.com/res/img/vgt01r.png) | This open source module is sponsored and supported by [Voxgig](https://www.voxgig.com). |
 |---|---|
 
+## Table of Contents
+  * [Install](#install)
+  * [Migration guide](#migration-guide)
+  * [Plugins and modules](#plugins-and-modules)
+    * [Disabling default plugins](#disabling-default-plugins)
+  * [Note about node version support](#note-about-node-version-support)
+  * [Options deprecated or no longer supported](#options-deprecated-or-no-longer-supported)
+  * [Restrict Login](#restrict-login)
+  * [JSON API and Redirects](#json-api-and-redirects)
+    * [Redirect](#redirect)
+  * [API](#api)
+    * [login](#login)
+    * [logout](#logout)
+    * [user - previously instance](#user---previously-instance)
+    * [register](#register)
+    * [create reset](#create-reset)
+    * [load reset](#load-reset)
+    * [execute reset](#execute-reset)
+    * [update user](#update-user)
+    * [change password](#change-password)
+  * [Example of using seneca-auth with Hapi](#example-of-using-seneca-auth-with-hapi)
+  * [Test](#test)
+
+
 Lead Maintainers: [Mircea Alexandru](https://github.com/mirceaalexandru) and [Mihai Dima](https://github.com/mihaidma)
 
 For a gentle introduction to Seneca itself, see the
