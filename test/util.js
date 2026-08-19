@@ -1,5 +1,6 @@
 var Assert = require('assert')
 var _ = require('lodash')
+var Passport = require('passport')
 
 exports.init = function (options, cb) {
   var agent
@@ -9,10 +10,17 @@ exports.init = function (options, cb) {
   var bodyparser = require('body-parser')
   var session = require('express-session')
 
-  var si = require('seneca')(/* {log: 'print'} */)
+  var si = require('seneca')({ log: 'silent' })
+
+  if (si.version >= '2.0.0') {
+    si.use(require('seneca-entity'))
+  }
+  if (si.version >= '3.0.0') {
+    si.use(require('seneca-web'))
+  }
+
   si.use('user')
   si.use(require('..'), _.extend({secure: true, restrict: '/api'}, options || {}))
-  si.use('seneca-local-auth', {})
 
   si.ready(function (err) {
     if (err) {
@@ -23,6 +31,8 @@ exports.init = function (options, cb) {
     app.use(cookieparser())
     app.use(bodyparser.json())
     app.use(session({secret: 'si', resave: true, saveUninitialized: true}))
+    app.use(Passport.initialize())
+    app.use(Passport.session())
 
     app.use(si.export('web'))
     agent = request(app)

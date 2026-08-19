@@ -1,7 +1,11 @@
 'use strict'
 
+// DO NOT RUN HAPI TESTS FOR NODE LESS THAN 4.0.0
+if (process.version < 'v4.0.0') {
+  return
+}
+
 var Assert = require('assert')
-var agent
 
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
@@ -12,7 +16,6 @@ var after = lab.after
 
 var Util = require('./hapi-util')
 
-var cookie
 
 suite('Hapi register-changepassword suite tests ', function () {
   var server
@@ -59,7 +62,7 @@ suite('Hapi register-changepassword suite tests ', function () {
       url: url,
       method: 'POST',
       payload: {password: 'uu1', repeat: 'uu1'},
-      headers: { cookie: 'seneca-login=' + cookie }
+      headers: {cookie: 'seneca-login=' + cookie}
     }, function (res) {
       console.log(res.payload)
       Assert.equal(200, res.statusCode)
@@ -76,7 +79,7 @@ suite('Hapi register-changepassword suite tests ', function () {
     server.inject({
       url: url,
       method: 'POST',
-      payload: {password: 'uu1', nick: 'u1', name: 'nu1', email: 'u1@example.com', }
+      payload: {password: 'uu1', nick: 'u1', name: 'nu1', email: 'u1@example.com'}
     }, function (res) {
       Assert.equal(200, res.statusCode)
       Assert(JSON.parse(res.payload).ok)
@@ -88,5 +91,4 @@ suite('Hapi register-changepassword suite tests ', function () {
       done()
     })
   })
-
 })

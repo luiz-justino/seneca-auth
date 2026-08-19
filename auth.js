@@ -4,7 +4,17 @@
 // External modules.
 var _ = require('lodash')
 var AuthUrlmatcher = require('auth-urlmatcher')
-var AuthToken = require('auth-token-cookie')
+var AuthTokenCookie = require('auth-token-cookie')
+
+// Internal modules
+var UserManagement = require('./lib/user-management')
+var AuthRedirect = require('auth-redirect')
+var LocalStrategy = require('seneca-local-auth')
+
+var Utility = require('./lib/common-utility')
+var ExpressAuth = require('./lib/express-auth')
+
+var HapiAuth = require('./lib/hapi-auth')
 
 // Load configuration
 var DefaultOptions = require('./default-options.js')
@@ -25,30 +35,39 @@ module.exports = function auth (opts) {
   // using seneca.util.deepextend here, as there are sub properties
   internals.options = seneca.util.deepextend(DefaultOptions, opts)
 
-  internals.load_default_express_plugins = function () {
-    // External seneca-auth modules
-    var AuthRedirect = require('auth-redirect')
+  internals.load_common_plugins = function () {
+    const plugins = internals.options.default_plugins
+    if (plugins.authTokenCookie) {
+      seneca.use(AuthTokenCookie, internals.options)
+    }
+    if (plugins.authUrlmatcher) {
+      seneca.use(AuthUrlmatcher, internals.options)
+    }
+    seneca.use(Utility, internals.options)
+    seneca.use(UserManagement, internals.options)
+    if (plugins.authRedirect) {
+      seneca.use(AuthRedirect, internals.options.redirect || {})
+    }
+  }
 
-    seneca.use(require('./lib/user-management'), internals.options)
-    seneca.use(require('./lib/express-utility'))
-    seneca.use(AuthUrlmatcher)
-    seneca.use(require('./lib/express-auth'), internals.options)
-    seneca.use(AuthToken, internals.options)
-    seneca.use(AuthRedirect, internals.options.redirect || {})
-    seneca.use(AuthUrlmatcher)
+  internals.load_default_express_plugins = function () {
+    internals.load_common_plugins()
+    seneca.use(ExpressAuth, internals.options)
+    if (internals.options.default_plugins.localAuth) {
+      seneca.use(LocalStrategy, internals.options)
+    }
   }
 
   internals.load_default_hapi_plugins = function () {
-    seneca.use(require('./lib/user-management'), internals.options)
-    seneca.use(require('./lib/hapi-utility'))
-    seneca.use(AuthToken, internals.options)
-    seneca.use(AuthUrlmatcher)
-    seneca.use(require('./lib/hapi-auth'), internals.options)
-    seneca.use(AuthUrlmatcher)
+    internals.load_common_plugins()
+    seneca.use(HapiAuth, internals.options)
+    if (internals.options.default_plugins.localAuth) {
+      seneca.use(LocalStrategy, internals.options)
+    }
   }
 
-  internals.choose_framework = function (){
-    if ('express' === internals.options.framework) {
+  internals.choose_framework = function () {
+    if (internals.options.framework === 'express') {
       internals.load_default_express_plugins()
     }
     else {
@@ -56,7 +75,7 @@ module.exports = function auth (opts) {
     }
   }
 
-  internals.migrate_options = function() {
+  internals.migrate_options = function () {
     if (internals.options.service || internals.options.sendemail || internals.options.email) {
       throw error('<' + (internals.options.service ? 'service' : (internals.options.sendemail ? 'sendemail' : 'email')) +
         '> option is no longer supported, please check seneca-auth documentation for migrating to new version of seneca-auth')
@@ -66,23 +85,24 @@ module.exports = function auth (opts) {
       seneca.log('<tokenkey> option is deprecated, please check seneca-auth documentation for migrating to new version of seneca-auth')
     }
 
-    if (seneca.options().plugin.web && seneca.options().plugin.web.framework){
+    if (seneca.options().plugin.web && seneca.options().plugin.web.framework) {
       internals.options.framework = seneca.options().plugin.web.framework
     }
+
     if (_.indexOf(internals.accepted_framworks, internals.options.framework) === -1) {
       throw error('Framework type <' + internals.options.framework + '> not supported.')
     }
   }
 
-  internals.migrate_options()
-  internals.choose_framework()
 
-  var m
-  if ((m = internals.options.prefix.match(/^(.*)\/+$/))) {
+  internals.migrate_options()
+
+  var m = internals.options.prefix.match(/^(.*)\/+$/)
+  if (m) {
     internals.options.prefix = m[1]
   }
 
-  seneca.ready()
+  internals.choose_framework()
 
   return {
     name: 'auth'

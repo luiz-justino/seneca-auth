@@ -1,7 +1,11 @@
 'use strict'
 
+// DO NOT RUN HAPI TESTS FOR NODE LESS THAN 4.0.0
+if (process.version < 'v4.0.0') {
+  return
+}
+
 var Assert = require('assert')
-var agent
 
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
@@ -11,8 +15,6 @@ var before = lab.before
 var after = lab.after
 
 var Util = require('./hapi-util.js')
-
-var cookie
 
 suite('Hapi register-update-user suite tests ', function () {
   var server
@@ -60,7 +62,7 @@ suite('Hapi register-update-user suite tests ', function () {
       url: url,
       method: 'POST',
       payload: changed_user,
-      headers: { cookie: 'seneca-login=' + cookie }
+      headers: {cookie: 'seneca-login=' + cookie}
     }, function (res) {
       Assert.equal(200, res.statusCode)
       Assert(JSON.parse(res.payload).ok)
@@ -77,18 +79,17 @@ suite('Hapi register-update-user suite tests ', function () {
     server.inject({
       url: url,
       method: 'POST',
-      payload: user,
+      payload: user
     }, function (res) {
-      Assert.equal(200, res.statusCode)
-      Assert(JSON.parse(res.payload).ok)
-      Assert(JSON.parse(res.payload).user)
-      Assert(JSON.parse(res.payload).login)
-      Assert.equal(changed_user.name, JSON.parse(res.payload).user.name)
+      Assert.equal(200, res.statusCode, 'Invalid status')
+      Assert(JSON.parse(res.payload).ok, 'ok value')
+      Assert(JSON.parse(res.payload).user, 'user value')
+      Assert(JSON.parse(res.payload).login, 'login value')
+      Assert.equal(changed_user.name, JSON.parse(res.payload).user.name, 'user name')
 
       cookie = Util.checkCookie(res)
 
       done()
     })
   })
-
 })
